@@ -1,11 +1,14 @@
 # rag_pipeline.py
 import os
+
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.chains import RetrievalQA
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 print(f"Using Google API Key: {GEMINI_API_KEY}")
@@ -42,25 +45,31 @@ def create_vector_store(chunks):
 
 def get_answer(vector_store, question: str) -> str:
     """Get answer from document using RAG"""
-    # Free Gemini Flash model
     llm = ChatGoogleGenerativeAI(
         model="gemini-1.5-flash",
         google_api_key=GEMINI_API_KEY,
         temperature=0.3
     )
     
-    # Retrieve top 3 most relevant chunks
-    retriever = vector_store.as_retriever(
-        search_kwargs={"k": 3}
-    )
+    retriever = vector_store.as_retriever(search_kwargs={"k": 3})
     
-    # RAG Chain — retrieves context, then generates answer
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=retriever,
-        return_source_documents=True
+    system_prompt = (
+        "You are a helpful assistant. Use the following context to answer questions.\n\n"
+        "{context}"
     )
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", system_prompt),
+        ("human", "{input}")
+    ])
     
-    result = qa_chain.invoke({"query": question})
-    return result["result"]
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+        
+    rag_chain = (
+        {"context": retriever | format_docs, "input": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+    result = rag_chain.invoke(question)
+    return result

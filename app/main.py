@@ -4,7 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import shutil
 import os
-from services.rag_pipeline import (
+
+from app.services.rag_pipeline import (
     load_and_chunk_pdf,
     create_vector_store,
     get_answer
