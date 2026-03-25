@@ -1,5 +1,10 @@
 # rag_pipeline.py
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -46,7 +51,7 @@ def create_vector_store(chunks):
 def get_answer(vector_store, question: str) -> str:
     """Get answer from document using RAG"""
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model="gemini-2.5-flash",
         google_api_key=GEMINI_API_KEY,
         temperature=0.3
     )
