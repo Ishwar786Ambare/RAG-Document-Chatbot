@@ -1,0 +1,55 @@
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# IDEs
+.idea/
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Logs
+*.log
+
+# Unit test / coverage reports
+.coverage
+.pytest_cache/
+htmlcov/
+
+# AI / ML / GenAI specific
+*.pt
+*.pth
+*.onnx
+*.h5
+*.hdf5
+*.tflite
+*.pb
+*.weights
+*.ckpt
+*.safetensors
+
+# Datasets and Large Files
+data/
+datasets/
+models/
+*.csv
+*.tsv
+*.jsonl
+*.parquet
+
+# HuggingFace / Caches
+.cache/
+.huggingface/
+
+# OS specific
+.DS_Store
+Thumbs.db
