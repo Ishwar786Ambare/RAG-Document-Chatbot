@@ -19,10 +19,18 @@ pip install -r requirements.txt
 ```
 
 ### Starting the Server:
-Run the FastAPI application from the terminal:
+Run the FastAPI application from the terminal using one of the following commands:
+
+**Option 1: Using Uvicorn directly (traditional method):**
 ```bash
 uvicorn app.main:app --reload
 ```
+
+**Option 2: Using FastAPI CLI (latest method):**
+```bash
+fastapi run app/main.py
+```
+
 Once the server is running, you can test the endpoints using the interactive Swagger UI by visiting: **http://localhost:8000/docs**
 
 ---
