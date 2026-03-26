@@ -47,3 +47,32 @@ Once the document is uploaded locally in the vector store, users can ask questio
 4. **Injecting Context**: The exact sentences/chunks retrieved from the PDF memory in step 2 are merged and injected into the prompt as the `{context}`, right alongside the user's specific `{input}` (question).
 5. **AI Generation (Gemini)**: The fully packaged prompt is sent over to the **Google Gemini 2.5 Flash** language model. Because Gemini is provided with both the question AND the exact subset of document data containing the answer, it synthesizes a highly accurate, tailored response.
 6. **Returning the Answer**: The generated text is parsed out and returned to the client as a clean, direct answer to their question.
+
+---
+
+## 5. Overall Flowchart
+The following Mermaid flowchart illustrates the complete process of how the RAG Document Chatbot works, from document upload to question answering:
+
+```mermaid
+graph TD
+    A[User Uploads PDF via POST /upload-pdf] --> B[File Storage in uploads/]
+    B --> C[Document Loading with PyPDFLoader]
+    C --> D[Text Splitting with RecursiveCharacterTextSplitter]
+    D --> E[Create Embeddings with HuggingFace model]
+    E --> F[Store Vectors in ChromaDB database]
+    F --> G[Document Ready for Queries]
+    
+    H[User Asks Question via POST /ask] --> I{Safety Check: Vector Store Exists?}
+    I -->|No| J[Prompt: Upload PDF First]
+    I -->|Yes| K[Convert Question to Vector]
+    K --> L[Similarity Search in ChromaDB]
+    L --> M[Retrieve Top 3 Relevant Chunks]
+    M --> N[Construct Prompt with Context]
+    N --> O[Send to Google Gemini 2.5 Flash]
+    O --> P[Generate Accurate Response]
+    P --> Q[Return Answer to User]
+    
+    G --> H
+    Q --> R[End]
+    J --> R
+```
